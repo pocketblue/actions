@@ -32,7 +32,7 @@ runs:
         types: |
           raw
 
-    - name: Post-process image artifacts
+    - name: Post-process images
       env:
         ESP_SIZE: ${{ inputs.esp_size }}
         FULL_IMAGE: ${{ steps.build-raw.outputs.output-directory }}
