@@ -1,0 +1,41 @@
+name: "Create partition images"
+inputs:
+  config_file:
+    required: true
+    type: string
+  esp_size:
+    required: true
+    type: number
+  rootfs:
+    type: string
+    default: btrfs
+  registry:
+    required: true
+    type: string
+  image_name:
+    required: true
+    type: string
+  image_tag:
+    type: string
+    default: '42'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build disk image
+      id: build-raw
+      uses: osbuild/bootc-image-builder-action@v0.0.2
+      with:
+        config-file: ${{ inputs.config_file }}
+        image: ${{ inputs.registry }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
+        rootfs: ${{ inputs.rootfs }}
+        types: |
+          raw
+
+    - name: Post-process image artifacts
+      env:
+        IMAGE_NAME: ${{ inputs.image_name }}
+        IMAGE_TAG: ${{ inputs.image_tag }}
+        ESP_SIZE: ${{ inputs.esp_size }}
+        FULL_IMAGE: ${{ steps.build-raw.outputs.output-directory }}
+      run: ${{ github.action_path }}/postprocess.sh
