@@ -37,3 +37,4 @@ runs:
         ESP_SIZE: ${{ inputs.esp_size }}
         FULL_IMAGE: ${{ steps.build-raw.outputs.output-directory }}
       run: ${{ github.action_path }}/postprocess.sh
+      shell: bash
