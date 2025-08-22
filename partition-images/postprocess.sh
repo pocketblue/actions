@@ -20,7 +20,7 @@ sudo mount -o loop images/esp.raw esp.new
 sudo cp -a esp.old/. esp.new/
 sudo umount esp.old/ esp.new/
 
+sudo chmod 666 images/*
+
 # pad the last block to 4096 bytes
 dd if=/dev/zero bs=1 count=512 | tee -a images/root.raw
-
-sudo chmod 666 images/*
