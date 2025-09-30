@@ -18,7 +18,20 @@ sudo mount -o loop efipart.vfat esp.old
 sudo mount -o loop images/esp.raw esp.new
 
 sudo cp -a esp.old/. esp.new/
-sudo umount esp.old/ esp.new/
+sudo umount esp.old/
+
+if [ "$INSTALL_DTB" = "true" ]; then
+    mkdir boot
+    sudo mount -o loop images/boot.raw boot
+
+    sudo cp -ar boot/ostree/default-*/dtb esp.new/dtb
+
+    sudo umount boot/
+    rmdir boot
+fi
+
+sudo umount esp.new/
+rmdir esp.old esp.new
 
 sudo chmod 666 images/*
 

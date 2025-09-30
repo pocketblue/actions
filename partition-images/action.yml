@@ -9,6 +9,9 @@ inputs:
   rootfs:
     type: string
     default: btrfs
+  install_dtb:
+    type: boolean
+    default: false
   registry:
     required: true
     type: string
@@ -36,5 +39,6 @@ runs:
       env:
         ESP_SIZE: ${{ inputs.esp_size }}
         FULL_IMAGE: ${{ steps.build-raw.outputs.output-directory }}
+        INSTALL_DTB: ${{ inputs.install_dtb }}
       run: ${{ github.action_path }}/postprocess.sh
       shell: bash
