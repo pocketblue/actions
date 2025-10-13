@@ -1,0 +1,59 @@
+name: images
+inputs:
+  device:
+    required: true
+    type: string
+  registry:
+    required: true
+    type: string
+  image_name:
+    required: true
+    type: string
+  image_tag:
+    required: true
+    type: string
+  args_7z:
+    type: string
+    default: ''
+  rootfs:
+    type: string
+    default: btrfs
+
+runs:
+  using: composite
+  steps:
+    - name: install latest 7z
+      shell: bash
+      run: |
+        curl -L https://7-zip.org/a/7z2501-linux-arm64.tar.xz | tar -xJf -
+        sudo cp 7zzs /bin/7z
+    - name: get device config
+      id: conf
+      shell: bash
+      run: |
+        cat 'devices/${{ inputs.device }}/device.conf' >> $GITHUB_OUTPUT
+    - name: build disk image
+      id: build-raw
+      uses: osbuild/bootc-image-builder-action@v0.0.2
+      with:
+        config-file: ${{ github.workspace }}/config.toml
+        image: ${{ inputs.registry }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
+        rootfs: ${{ inputs.rootfs }}
+        types: |
+          raw
+    - name: post-process images
+      env:
+        ESP_SIZE: ${{ steps.conf.outputs.esp_size }}
+        INSTALL_DTB: ${{ steps.conf.outputs.install_dtb }}
+        FULL_IMAGE: ${{ steps.build-raw.outputs.output-directory }}
+      shell: bash
+      run: ${{ github.action_path }}/postprocess.sh
+
+    - name: collect artifacts
+      shell: bash
+      env:
+        DEVICE: ${{ inputs.device }}
+        IMAGE_NAME: ${{ inputs.image_name }}
+        IMAGE_TAG: ${{ inputs.image_tag }}
+        ARGS_7Z: ${{ inputs.args_7z}}
+      run: devices/$DEVICE/scripts/artifacts.sh
