@@ -5,7 +5,7 @@ inputs:
     type: string
   esp_size:
     required: true
-    type: number
+    type: string
   rootfs:
     type: string
     default: btrfs
