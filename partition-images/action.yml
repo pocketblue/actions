@@ -3,6 +3,9 @@ inputs:
   config_file:
     required: true
     type: string
+  esp_size:
+    required: true
+    type: number
   rootfs:
     type: string
     default: btrfs
@@ -34,6 +37,7 @@ runs:
 
     - name: Post-process images
       env:
+        ESP_SIZE: ${{ inputs.esp_size }}
         FULL_IMAGE: ${{ steps.build-raw.outputs.output-directory }}
         INSTALL_DTB: ${{ inputs.install_dtb }}
       run: ${{ github.action_path }}/postprocess.sh

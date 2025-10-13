@@ -10,7 +10,7 @@ sudo dd if=/dev/mapper/loop0p2 of=images/fedora_boot.raw bs=1M
 sudo dd if=/dev/mapper/loop0p3 of=images/fedora_rootfs.raw bs=1M
 
 VOLID=$(file efipart.vfat | grep -Eo "serial number 0x.{8}" | cut -d' ' -f3)
-truncate -s 256M images/fedora_esp.raw
+truncate -s $ESP_SIZE images/fedora_esp.raw
 mkfs.vfat -F 32 -S 4096 -n EFI -i $VOLID images/fedora_esp.raw
 
 mkdir -p esp.old esp.new
