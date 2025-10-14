@@ -1,0 +1,29 @@
+name: push container to registry
+runs:
+  using: composite
+  steps:
+    - name: login to registry
+      shell: bash
+      run: |
+        sudo podman login --username $username --password $password $registry
+    - name: tag rechunked image
+      if: ${{ env.rechunk_ref }}
+      shell: bash
+      run: |
+        export rechunked=$(sudo podman pull '${{ env.rechunk_ref }}')
+        sudo podman image tag $rechunked $registry/$image:$tag
+    - name: tag non-rechunked image
+      if: ${{ !env.rechunk_ref }}
+      shell: bash
+      run: |
+        sudo podman image tag localhost/$image:$tag $registry/$image:$tag
+    - name: push to registry
+      shell: bash
+      run: |
+        sudo podman push $registry/$image:$tag
+    - name: latest
+      if: ${{ env.latest }}
+      shell: bash
+      run: |
+        sudo podman image tag $registry/$image:$tag $registry/$image:latest
+        sudo podman push $registry/$image:latest

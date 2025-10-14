@@ -1,0 +1,43 @@
+name: get container configuration
+inputs:
+  from_tag:
+    required: true
+  vars_registry:
+    required: true
+outputs:
+  target_tag:
+    value: ${{ steps.tag.outputs.target_tag }}
+  expires:
+    value: ${{ steps.tag.outputs.expires }}
+  latest:
+    value: ${{ steps.tag.outputs.latest }}
+  registry:
+    value: ${{ steps.registry.outputs.registry }}
+
+runs:
+  using: composite
+  steps:
+    - id: tag
+      shell: bash
+      run: |
+        if [[ '${{ github.ref_name }}' == main && '${{ inputs.from_tag }}' = 42 ]]; then
+          echo target_tag=42 >> $GITHUB_OUTPUT
+          echo expires= >> $GITHUB_OUTPUT
+          echo latest=true >> $GITHUB_OUTPUT
+        elif [[ '${{ github.ref_name }}' == main ]]; then
+          echo 'target_tag=${{ inputs.from_tag }}' >> $GITHUB_OUTPUT
+          echo expires= >> $GITHUB_OUTPUT
+          echo latest= >> $GITHUB_OUTPUT
+        else
+          echo 'target_tag=${{ inputs.from_tag }}-${{ github.ref_name }}' >> $GITHUB_OUTPUT
+          echo expires=true >> $GITHUB_OUTPUT
+          echo latest= >> $GITHUB_OUTPUT
+        fi
+    - id: registry
+      shell: bash
+      run: |
+        if [[ '${{ inputs.vars_registry }}' ]]; then
+          echo 'registry=${{ inputs.vars_registry }}' >> $GITHUB_OUTPUT
+        else
+          echo 'registry=ghcr.io/${{ github.repository_owner }}' >> $GITHUB_OUTPUT
+        fi
