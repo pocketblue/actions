@@ -28,6 +28,10 @@ runs:
           echo 'target_tag=${{ inputs.from_tag }}' >> $GITHUB_OUTPUT
           echo expires= >> $GITHUB_OUTPUT
           echo latest= >> $GITHUB_OUTPUT
+        elif [[ '${{ inputs.from_tag }}' == *'${{ github.ref_name }}' ]]; then
+          echo 'target_tag=${{ inputs.from_tag }}' >> $GITHUB_OUTPUT
+          echo expires=true >> $GITHUB_OUTPUT
+          echo latest= >> $GITHUB_OUTPUT
         else
           echo 'target_tag=${{ inputs.from_tag }}-${{ github.ref_name }}' >> $GITHUB_OUTPUT
           echo expires=true >> $GITHUB_OUTPUT
