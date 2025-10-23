@@ -9,8 +9,8 @@ download_file() {
     url=$2
     checksum=$3
 
-    curl -L ${url} -o ${name}
-    echo "${checksum} ${name}" | sha256sum --check
+    curl -L ${url} -o out/${name}
+    echo "${checksum} out/${name}" | sha256sum --check
 }
 
 while IFS= read -r line; do
