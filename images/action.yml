@@ -56,4 +56,6 @@ runs:
         IMAGE_NAME: ${{ inputs.image_name }}
         IMAGE_TAG: ${{ inputs.image_tag }}
         ARGS_7Z: ${{ inputs.args_7z}}
-      run: devices/$DEVICE/scripts/artifacts.sh
+      run: |
+        ${{ github.action_path }}/download-extra.sh devices/$DEVICE/scripts/downloads
+        devices/$DEVICE/scripts/artifacts.sh
