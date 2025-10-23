@@ -9,7 +9,7 @@ mv images out/
 
 # extra downloads
 if [ -f "$DEVICE_PATH/scripts/downloads" ]; then
-    $ACTION_PATH/download-extra.sh $DEVICE_PATH/scripts/downloads
+    $ACTION_PATH/download-extra.sh $DEVICE_PATH/scripts/extra-sources
 fi
 
 # custom artifact processing script
