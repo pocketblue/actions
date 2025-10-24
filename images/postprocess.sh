@@ -10,7 +10,7 @@ sudo dd if=/dev/mapper/loop0p2 of=images/fedora_boot.raw bs=1M
 sudo dd if=/dev/mapper/loop0p3 of=images/fedora_rootfs.raw bs=1M
 
 VOLID=$(file efipart.vfat | grep -Eo "serial number 0x.{8}" | cut -d' ' -f3)
-truncate -s $ESP_SIZE images/fedora_esp.raw
+truncate -s $CONF_ESP_SIZE images/fedora_esp.raw
 mkfs.vfat -F 32 -S 4096 -n EFI -i $VOLID images/fedora_esp.raw
 
 mkdir -p esp.old esp.new
@@ -20,7 +20,7 @@ sudo mount -o loop images/fedora_esp.raw esp.new
 sudo cp -a esp.old/. esp.new/
 sudo umount esp.old/
 
-if [ "$INSTALL_DTB" = "true" ]; then
+if [ "$CONF_INSTALL_DTB" = "true" ]; then
     mkdir boot
     sudo mount -o loop images/fedora_boot.raw boot
 
