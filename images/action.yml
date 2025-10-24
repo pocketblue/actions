@@ -52,8 +52,9 @@ runs:
     - name: collect artifacts
       shell: bash
       env:
-        DEVICE: ${{ inputs.device }}
+        DEVICE_PATH: devices/${{ inputs.device }}
         IMAGE_NAME: ${{ inputs.image_name }}
         IMAGE_TAG: ${{ inputs.image_tag }}
         ARGS_7Z: ${{ inputs.args_7z}}
-      run: devices/$DEVICE/scripts/artifacts.sh
+        ACTION_PATH: ${{ github.action_path }}
+      run: ${{ github.action_path }}/collect-artifacts.sh
