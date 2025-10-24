@@ -44,7 +44,8 @@ runs:
     - name: post-process images
       env:
         CONF_ESP_SIZE: ${{ steps.conf.outputs.esp_size }}
-        CONF_INSTALL_DTB: ${{ steps.conf.outputs.install_dtb }}
+        CONF_INSTALL_DTB: ${{ steps.conf.outputs.install_dtb | 'false' }}
+        CONF_SPLIT_PARTITIONS: ${{ steps.conf.outputs.split_partitions | 'true' }}
         FULL_IMAGE: ${{ steps.build-raw.outputs.output-directory }}
       shell: bash
       run: ${{ github.action_path }}/postprocess.sh
