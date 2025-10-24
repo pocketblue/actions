@@ -31,7 +31,7 @@ runs:
       id: conf
       shell: bash
       run: |
-        cat 'devices/${{ inputs.device }}/device.conf' >> $GITHUB_OUTPUT
+        cat 'devices/${{ inputs.device }}/build-aux/device.conf' >> $GITHUB_OUTPUT
     - name: build disk image
       id: build-raw
       uses: osbuild/bootc-image-builder-action@v0.0.2
