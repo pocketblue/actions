@@ -1,0 +1,52 @@
+name: images
+inputs:
+  device:
+    required: true
+    type: string
+  registry:
+    required: true
+    type: string
+  image_name:
+    required: true
+    type: string
+  image_tag:
+    required: true
+    type: string
+  args_7z:
+    type: string
+    default: ''
+  rootfs:
+    type: string
+    default: btrfs
+
+runs:
+  using: composite
+  steps:
+    - name: install latest 7z
+      shell: bash
+      run: |
+        curl -L https://7-zip.org/a/7z2501-linux-arm64.tar.xz | tar -xJf -
+        sudo cp 7zzs /bin/7z
+
+    - name: build disk image
+      id: build-anaconda
+      uses: osbuild/bootc-image-builder-action@v0.0.2
+      with:
+        config-file: ${{ github.workspace }}/anaconda.toml
+        image: ${{ inputs.registry }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
+        rootfs: ${{ inputs.rootfs }}
+        types: |
+          anaconda-iso
+
+    - name: collect artifacts
+      shell: bash
+      env:
+        DEVICE_PATH: devices/${{ inputs.device }}
+        IMAGE_NAME: ${{ inputs.image_name }}
+        IMAGE_TAG: ${{ inputs.image_tag }}
+        ARGS_7Z: ${{ inputs.args_7z}}
+        ACTION_PATH: ${{ github.action_path }}
+        FULL_IMAGE: ${{ steps.build-anaconda.outputs.anaconda-iso-output-path }}
+      run: |
+        cp ./$FULL_IMAGE ./anaconda-iso.iso
+        7z a -mx=9 $ARGS_7Z "pocketblue-$IMAGE_NAME-$IMAGE_TAG.7z" anaconda-iso.iso
