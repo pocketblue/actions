@@ -18,4 +18,5 @@ export DEVICE_PATH=$(realpath $DEVICE_PATH)
 $DEVICE_PATH/build-aux/artifacts.sh
 
 # pack the artifacts
-7z a -mx=9 $ARGS_7Z "pocketblue-$IMAGE_NAME-$IMAGE_TAG.7z" out/*
+cd out
+7z a -mx=9 $ARGS_7Z "../pocketblue-$IMAGE_NAME-$IMAGE_TAG.7z" .
