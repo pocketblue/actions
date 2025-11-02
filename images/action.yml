@@ -44,9 +44,11 @@ runs:
     - name: post-process images
       env:
         CONF_ESP_SIZE: ${{ steps.conf.outputs.esp_size }}
+        CONF_BOOT_SIZE: ${{ steps.conf.outputs.boot_size }}
         CONF_INSTALL_DTB: ${{ steps.conf.outputs.install_dtb }}
         CONF_SPLIT_PARTITIONS: ${{ steps.conf.outputs.split_partitions }}
         FULL_IMAGE: ${{ steps.build-raw.outputs.output-directory }}
+        ACTION_PATH: ${{ github.action_path }}
       shell: bash
       run: ${{ github.action_path }}/postprocess.sh
 
