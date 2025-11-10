@@ -4,6 +4,8 @@ inputs:
     required: true
   vars_registry:
     required: true
+  from_registry:
+    required: true
 outputs:
   target_tag:
     value: ${{ steps.tag.outputs.target_tag }}
@@ -11,8 +13,10 @@ outputs:
     value: ${{ steps.tag.outputs.expires }}
   latest:
     value: ${{ steps.tag.outputs.latest }}
-  registry:
-    value: ${{ steps.registry.outputs.registry }}
+  from_registry:
+    value: ${{ steps.registry.outputs.from_registry }}
+  target_registry:
+    value: ${{ steps.registry.outputs.target_registry }}
 
 runs:
   using: composite
@@ -40,8 +44,15 @@ runs:
     - id: registry
       shell: bash
       run: |
-        if [[ '${{ inputs.vars_registry }}' ]]; then
-          echo 'registry=${{ inputs.vars_registry }}' >> $GITHUB_OUTPUT
+        if [[ '${{ inputs.from_registry }}' ]]; then
+          echo 'from_registry=${{ inputs.from_registry }}' >> $GITHUB_OUTPUT
+        elif [[ '${{ inputs.vars_registry }}' ]]; then
+          echo 'from_registry=${{ inputs.vars_registry }}' >> $GITHUB_OUTPUT
         else
-          echo 'registry=ghcr.io/${{ github.repository_owner }}' >> $GITHUB_OUTPUT
+          echo 'from_registry=ghcr.io/${{ github.repository_owner }}' >> $GITHUB_OUTPUT
+        fi
+        if [[ '${{ inputs.vars_registry }}' ]]; then
+          echo 'target_registry=${{ inputs.vars_registry }}' >> $GITHUB_OUTPUT
+        else
+          echo 'target_registry=ghcr.io/${{ github.repository_owner }}' >> $GITHUB_OUTPUT
         fi
