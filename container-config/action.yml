@@ -63,6 +63,8 @@ runs:
               'devices',
               JSON.stringify(device == 'all' ? device_list : [device])
             );
+          } else {
+            core.setOutput('devices', '');
           }
       env:
         DEVICE: ${{ inputs.device }}
