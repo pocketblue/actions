@@ -56,7 +56,7 @@ runs:
       with:
         script: |
           const device = process.env.DEVICE;
-          const device_list = process.env.DEVICE_LIST.split(/\r\n|\r|\n/g);
+          const device_list = process.env.DEVICE_LIST.trim().split('\n');
 
           if (device) {
             core.setOutput(
