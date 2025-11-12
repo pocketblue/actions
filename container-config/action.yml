@@ -4,6 +4,10 @@ inputs:
     required: true
   vars_registry:
     required: true
+  device:
+    required: true
+  device_list:
+    required: true
 outputs:
   target_tag:
     value: ${{ steps.tag.outputs.target_tag }}
@@ -13,6 +17,8 @@ outputs:
     value: ${{ steps.tag.outputs.latest }}
   registry:
     value: ${{ steps.registry.outputs.registry }}
+  devices:
+    value: ${{ steps.devices.outputs.devices }}
 
 runs:
   using: composite
@@ -45,3 +51,21 @@ runs:
         else
           echo 'registry=ghcr.io/${{ github.repository_owner }}' >> $GITHUB_OUTPUT
         fi
+    - id: devices
+      uses: actions/github-script@v8
+      with:
+        script: |
+          const device = process.env.DEVICE;
+          const device_list = process.env.DEVICE_LIST.trim().split('\n');
+
+          if (device) {
+            core.setOutput(
+              'devices',
+              JSON.stringify(device == 'all' ? device_list : [device])
+            );
+          } else {
+            core.setOutput('devices', '');
+          }
+      env:
+        DEVICE: ${{ inputs.device }}
+        DEVICE_LIST: ${{ inputs.device_list }}
