@@ -8,14 +8,14 @@ mkdir out
 mv images out/
 
 # extra downloads
-if [ -f "$DEVICE_PATH/build-aux/extra-sources" ]; then
-    $ACTION_PATH/download-extra.sh $DEVICE_PATH/build-aux/extra-sources
+if [ -f "$DEVICE_PATH/$BUILD_AUX/extra-sources" ]; then
+    $ACTION_PATH/download-extra.sh $DEVICE_PATH/$BUILD_AUX/extra-sources
 fi
 
 # custom artifact processing script
 export OUT_PATH=$(realpath ./out)
 export DEVICE_PATH=$(realpath $DEVICE_PATH)
-$DEVICE_PATH/build-aux/artifacts.sh
+$DEVICE_PATH/$BUILD_AUX/artifacts.sh
 
 # pack the artifacts
 cd out
