@@ -18,6 +18,10 @@ inputs:
   rootfs:
     type: string
     default: btrfs
+  build_aux:
+    type: string
+    description: name of the build-aux directory
+    default: 'build-aux'
 
 runs:
   using: composite
@@ -31,7 +35,7 @@ runs:
       id: conf
       shell: bash
       run: |
-        cat 'devices/${{ inputs.device }}/build-aux/device.conf' >> $GITHUB_OUTPUT
+        cat 'devices/${{ inputs.device }}/${{ inputs.build_aux }}/device.conf' >> $GITHUB_OUTPUT
     - name: build disk image
       id: build-raw
       uses: osbuild/bootc-image-builder-action@v0.0.2
@@ -49,6 +53,7 @@ runs:
         CONF_SPLIT_PARTITIONS: ${{ steps.conf.outputs.split_partitions }}
         FULL_IMAGE: ${{ steps.build-raw.outputs.output-directory }}
         ACTION_PATH: ${{ github.action_path }}
+        BUILD_AUX: ${{ inputs.build_aux }}
       shell: bash
       run: ${{ github.action_path }}/postprocess.sh
 
@@ -60,4 +65,5 @@ runs:
         IMAGE_TAG: ${{ inputs.image_tag }}
         ARGS_7Z: ${{ inputs.args_7z}}
         ACTION_PATH: ${{ github.action_path }}
+        BUILD_AUX: ${{ inputs.build_aux }}
       run: ${{ github.action_path }}/collect-artifacts.sh
