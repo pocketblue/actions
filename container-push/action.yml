@@ -9,10 +9,13 @@ runs:
     - name: Push to registry
       shell: bash
       run: |
+        # push twice as a workaround to push rechunk annotations
+        sudo podman push $registry/$name:$tag
         sudo podman push $registry/$name:$tag
     - name: Latest
       if: ${{ env.latest }}
       shell: bash
       run: |
         sudo podman image tag $registry/$name:$tag $registry/$name:latest
+        sudo podman push $registry/$name:latest
         sudo podman push $registry/$name:latest
