@@ -18,4 +18,4 @@ sudo mount "$esp_dev" "$tmp_dir/esp.old"
 sudo cp -a "$tmp_dir/esp.new/." "$tmp_dir/esp.old/"
 sudo umount "$tmp_dir/esp.old"
 
-rm -r "$tmp_dir"
+sudo rm -r "$tmp_dir"
