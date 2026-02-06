@@ -5,7 +5,12 @@ set -uexo pipefail
 which 7z
 
 mkdir out
-mv images out/
+if [ -d images ]; then
+    mv images out/
+fi
+if [ -f disk.raw ]; then
+    mv disk.raw out/
+fi
 
 # extra downloads
 if [ -f "$DEVICE_PATH/$BUILD_AUX/extra-sources" ]; then
