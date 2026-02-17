@@ -26,17 +26,23 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: install latest 7z
+    - name: Install latest 7z
       shell: bash
       run: |
         curl -L https://7-zip.org/a/7z2501-linux-arm64.tar.xz | tar -xJf -
         sudo cp 7zzs /bin/7z
-    - name: get device config
+    - name: Get device config
       id: conf
       shell: bash
       run: |
         cat 'devices/${{ inputs.device }}/${{ inputs.build_aux }}/device.conf' >> $GITHUB_OUTPUT
-    - name: build disk image
+    - name: Install erofs-utils
+      if: ${{ steps.conf.outputs.build_erofs == 'true' }}
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y erofs-utils
+    - name: Build disk image
       id: build-raw
       uses: osbuild/bootc-image-builder-action@v0.0.2
       with:
@@ -45,7 +51,7 @@ runs:
         rootfs: ${{ inputs.rootfs }}
         types: |
           raw
-    - name: post-process images
+    - name: Post-process images
       env:
         CONF_ESP_SIZE: ${{ steps.conf.outputs.esp_size }}
         CONF_ESP_SECTOR_SIZE: ${{ steps.conf.outputs.esp_sector_size || '4096' }}
@@ -59,7 +65,7 @@ runs:
       shell: bash
       run: ${{ github.action_path }}/postprocess.sh
 
-    - name: collect artifacts
+    - name: Collect artifacts
       shell: bash
       env:
         DEVICE_PATH: devices/${{ inputs.device }}
