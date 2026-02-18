@@ -16,6 +16,12 @@ cleanup() {
 }
 trap cleanup EXIT
 
-sudo mount -o loop,ro "$ROOTFS_RAW" "$ROOTFS_MOUNT"
+if [ "$ROOTFS_TYPE" = "btrfs" ]; then
+    MOUNT_OPTS="loop,ro,subvol=root"
+else
+    MOUNT_OPTS="loop,ro"
+fi
+
+sudo mount -o "$MOUNT_OPTS" "$ROOTFS_RAW" "$ROOTFS_MOUNT"
 sudo mkfs.erofs -zlz4 -C1048576 "$ROOTFS_ERO" "$ROOTFS_MOUNT"
 sudo chown "$(id -u):$(id -g)" "$ROOTFS_ERO"
