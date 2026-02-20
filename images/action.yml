@@ -63,6 +63,7 @@ runs:
         FULL_IMAGE: ${{ steps.build-raw.outputs.output-directory }}
         ACTION_PATH: ${{ github.action_path }}
         BUILD_AUX: ${{ inputs.build_aux }}
+        OCI_IMAGE: ${{ inputs.registry }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
       shell: bash
       run: ${{ github.action_path }}/postprocess.sh
 
