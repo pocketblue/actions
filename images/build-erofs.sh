@@ -4,24 +4,18 @@ set -uexo pipefail
 
 which mkfs.erofs
 
-ROOTFS_RAW=images/fedora_rootfs.raw
+ROOTFS_TAR=rootfs.tar
+ROOTFS_EXTRACT=pocketblue-rootfs
 ROOTFS_ERO=rootfs.ero
 
-ROOTFS_MOUNT=$(mktemp -d)
-cleanup() {
-    if mountpoint -q "$ROOTFS_MOUNT"; then
-        sudo umount "$ROOTFS_MOUNT" || true
-    fi
-    rmdir "$ROOTFS_MOUNT" || true
-}
-trap cleanup EXIT
+CTR="$(sudo podman create --rm $OCI_IMAGE /usr/bin/bash)"
+sudo podman export "$CTR" > $ROOTFS_TAR
 
-if [ "$ROOTFS_TYPE" = "btrfs" ]; then
-    MOUNT_OPTS="loop,ro,subvol=root"
-else
-    MOUNT_OPTS="loop,ro"
-fi
+mkdir $ROOTFS_EXTRACT
+sudo tar --xattrs-include='*' -p -xf $ROOTFS_TAR -C $ROOTFS_EXTRACT
+rm $ROOTFS_TAR
 
-sudo mount -o "$MOUNT_OPTS" "$ROOTFS_RAW" "$ROOTFS_MOUNT"
-sudo mkfs.erofs -zlz4 -C1048576 "$ROOTFS_ERO" "$ROOTFS_MOUNT"
-sudo chown "$(id -u):$(id -g)" "$ROOTFS_ERO"
+sudo mkfs.erofs -zlz4 -C1048576 $ROOTFS_ERO $ROOTFS_EXTRACT
+sudo rm -rf $ROOTFS_EXTRACT
+
+sudo chown "$(id -u):$(id -g)" $ROOTFS_ERO
