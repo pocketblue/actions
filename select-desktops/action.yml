@@ -1,0 +1,28 @@
+name: select desktops
+inputs:
+  desktop:
+    required: true
+  desktop_list:
+    required: true
+outputs:
+  desktops:
+    value: ${{ steps.desktops.outputs.desktops }}
+
+runs:
+  using: composite
+  steps:
+    - id: desktops
+      uses: actions/github-script@v8
+      with:
+        script: |
+            const desktop = process.env.DESKTOP;
+            const desktopList = process.env.DESKTOP_LIST.trim().split('\n');
+
+            if (desktop && desktop !== 'all') {
+              core.setOutput('desktops', JSON.stringify([desktop]));
+            } else {
+              core.setOutput('desktops', JSON.stringify(desktopList));
+            }
+      env:
+        DESKTOP: ${{ inputs.desktop }}
+        DESKTOP_LIST: ${{ inputs.desktop_list }}
