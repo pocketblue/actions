@@ -44,7 +44,7 @@ runs:
         sudo apt-get install -y erofs-utils
     - name: Build disk image
       id: build-raw
-      uses: osbuild/bootc-image-builder-action@v0.0.2
+      uses: osbuild/bootc-image-builder-action@main
       with:
         config-file: ${{ github.workspace }}/bootc-image-builder.toml
         image: ${{ inputs.registry }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
