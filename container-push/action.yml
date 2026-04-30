@@ -2,10 +2,19 @@ name: push container to registry
 runs:
   using: composite
   steps:
+    # This produces some warinigs which can be ignored
+    - name: Enable cache for brew
+      uses: actions/cache@v5
+      id: brew-cache
+      with:
+        path: /home/linuxbrew
+        key: brew
+
     # TODO: remove me when we have a new podman in 26.04 runners
     # needed because old podman doesn't push layer annotations for
     # the rpm-ostree rechunker at all
     - name: Install Podman from Brew
+      if: steps.brew-cache.outputs.cache-hit != 'true'
       shell: bash
       run: |
         /home/linuxbrew/.linuxbrew/bin/brew install podman
