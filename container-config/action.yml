@@ -26,8 +26,8 @@ runs:
     - id: tag
       shell: bash
       run: |
-        if [[ '${{ github.ref_name }}' == main && '${{ inputs.from_tag }}' = 42 ]]; then
-          echo target_tag=42 >> $GITHUB_OUTPUT
+        if [[ '${{ github.ref_name }}' == main && '${{ inputs.from_tag }}' = 44 ]]; then
+          echo target_tag=44 >> $GITHUB_OUTPUT
           echo expires= >> $GITHUB_OUTPUT
           echo latest=true >> $GITHUB_OUTPUT
         elif [[ '${{ github.ref_name }}' == main ]]; then
