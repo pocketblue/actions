@@ -23,10 +23,15 @@ runs:
       run: |
         /home/linuxbrew/.linuxbrew/bin/brew install podman
 
+    - name: Install Cosign
+      if: ${{ env.signing_key }}
+      uses: sigstore/cosign-installer@v4.1.1
+
     - name: Login to registry
       shell: bash
       run: |
         sudo podman login --username $username --password $password $registry
+        echo "$password" | docker login -u $username --password-stdin $registry # for cosign
 
     - name: Push to registry
       id: push
@@ -37,6 +42,12 @@ runs:
         echo "digest=$(< /tmp/digestfile)" | tee "${GITHUB_OUTPUT}"
         sudo /home/linuxbrew/.linuxbrew/bin/podman push --digestfile=/tmp/digestfile $registry/$name:$tag
         echo "digest=$(< /tmp/digestfile)" | tee "${GITHUB_OUTPUT}"
+
+    - name: Sign with cosign
+      if: ${{ env.signing_key }}
+      shell: bash
+      run: |
+        cosign sign -y --new-bundle-format=false --use-signing-config=false --key env://signing_key "$registry/$name@${{ steps.push.outputs.digest }}"
 
     - name: Latest
       if: ${{ env.latest }}
