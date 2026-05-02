@@ -1,4 +1,8 @@
 name: push container to registry
+outputs:
+  digest:
+    value: ${{ steps.push.outputs.digest }}
+
 runs:
   using: composite
   steps:
@@ -25,11 +29,14 @@ runs:
         sudo podman login --username $username --password $password $registry
 
     - name: Push to registry
+      id: push
       shell: bash
       run: |
         # HACK: push twice as a workaround to push rechunk annotations
-        sudo /home/linuxbrew/.linuxbrew/bin/podman push $registry/$name:$tag
-        sudo /home/linuxbrew/.linuxbrew/bin/podman push $registry/$name:$tag
+        sudo /home/linuxbrew/.linuxbrew/bin/podman push --digestfile=/tmp/digestfile $registry/$name:$tag
+        echo "digest=$(< /tmp/digestfile)" | tee "${GITHUB_OUTPUT}"
+        sudo /home/linuxbrew/.linuxbrew/bin/podman push --digestfile=/tmp/digestfile $registry/$name:$tag
+        echo "digest=$(< /tmp/digestfile)" | tee "${GITHUB_OUTPUT}"
 
     - name: Latest
       if: ${{ env.latest }}
