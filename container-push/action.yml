@@ -6,23 +6,6 @@ outputs:
 runs:
   using: composite
   steps:
-    # This produces some warinigs which can be ignored
-    - name: Enable cache for brew
-      uses: actions/cache@v5
-      id: brew-cache
-      with:
-        path: /home/linuxbrew
-        key: brew
-
-    # TODO: remove me when we have a new podman in 26.04 runners
-    # needed because old podman doesn't push layer annotations for
-    # the rpm-ostree rechunker at all
-    - name: Install Podman from Brew
-      if: steps.brew-cache.outputs.cache-hit != 'true'
-      shell: bash
-      run: |
-        /home/linuxbrew/.linuxbrew/bin/brew install podman
-
     - name: Install Cosign
       if: ${{ env.signing_key }}
       uses: sigstore/cosign-installer@v4.1.1
@@ -38,9 +21,9 @@ runs:
       shell: bash
       run: |
         # HACK: push twice as a workaround to push rechunk annotations
-        sudo /home/linuxbrew/.linuxbrew/bin/podman push --digestfile=/tmp/digestfile $registry/$name:$tag
+        sudo podman push --digestfile=/tmp/digestfile $registry/$name:$tag
         echo "digest=$(< /tmp/digestfile)" | tee "${GITHUB_OUTPUT}"
-        sudo /home/linuxbrew/.linuxbrew/bin/podman push --digestfile=/tmp/digestfile $registry/$name:$tag
+        sudo podman push --digestfile=/tmp/digestfile $registry/$name:$tag
         echo "digest=$(< /tmp/digestfile)" | tee "${GITHUB_OUTPUT}"
 
     - name: Sign with cosign
@@ -54,5 +37,5 @@ runs:
       shell: bash
       run: |
         sudo podman image tag $registry/$name:$tag $registry/$name:latest
-        sudo /home/linuxbrew/.linuxbrew/bin/podman push $registry/$name:latest
-        sudo /home/linuxbrew/.linuxbrew/bin/podman push $registry/$name:latest
+        sudo podman push $registry/$name:latest
+        sudo podman push $registry/$name:latest
