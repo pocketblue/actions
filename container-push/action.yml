@@ -20,10 +20,24 @@ runs:
       id: push
       shell: bash
       run: |
+        # retry 3 times
+        function push {
+          n=0
+          until [ "$n" -ge 3 ]; do
+            sudo podman push --digestfile=/tmp/digestfile $registry/$name:$tag && break
+            n=$((n+1))
+            sleep 10
+          done
+
+          if [ "$n" -ge 3 ]; then
+             exit 1
+          fi
+        }
+
         # HACK: push twice as a workaround to push rechunk annotations
-        sudo podman push --digestfile=/tmp/digestfile $registry/$name:$tag
-        echo "digest=$(< /tmp/digestfile)" | tee "${GITHUB_OUTPUT}"
-        sudo podman push --digestfile=/tmp/digestfile $registry/$name:$tag
+        push
+        push
+
         echo "digest=$(< /tmp/digestfile)" | tee "${GITHUB_OUTPUT}"
 
     - name: Sign with cosign
@@ -37,5 +51,19 @@ runs:
       shell: bash
       run: |
         sudo podman image tag $registry/$name:$tag $registry/$name:latest
-        sudo podman push $registry/$name:latest
-        sudo podman push $registry/$name:latest
+
+        function push {
+          n=0
+          until [ "$n" -ge 3 ]; do
+            sudo podman push $registry/$name:latest && break
+            n=$((n+1))
+            sleep 10
+          done
+
+          if [ "$n" -ge 3 ]; then
+             exit 1
+          fi
+        }
+
+        push
+        push
